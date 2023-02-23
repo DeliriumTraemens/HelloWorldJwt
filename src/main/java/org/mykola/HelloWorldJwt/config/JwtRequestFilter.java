@@ -19,7 +19,9 @@ import java.io.IOException;
 /**The JwtRequestFilter extends the Spring Web Filter OncePerRequestFilter class.
  * For any incoming request this Filter class gets executed.
  * It checks if the request has a valid JWT token. If it has a valid JWT Token then it sets the Authentication in the context,
- * to specify that the current user is authenticated.*/
+ * to specify that the current user is authenticated.
+ * Именно в этом классе из Запроса выдергивается Хедер Authorization, хранящий ТОКЕН!!!
+ * */
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {

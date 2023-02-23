@@ -13,6 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+
 @RestController
 @CrossOrigin
 public class JwtAuthenticationController {
@@ -24,7 +27,7 @@ public class JwtAuthenticationController {
     private JwtUserDetailsService userDetailsService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest, HttpServletRequest request) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
@@ -32,8 +35,28 @@ public class JwtAuthenticationController {
                 .loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
+//
 
+
+        printHttpRequestHeader(request);
+
+//
         return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    private void printHttpRequestHeader(HttpServletRequest request) {
+        String remoteAddress=request.getRemoteAddr();
+        String forwarded = request.getHeader("X-FORWARDED-FOR");
+        System.out.println("\n======== Request Headers =========");
+        System.out.println("===========\nRemoteAddress is " + remoteAddress+"\n===========");
+        System.out.println("===========\nForwardedAddress is " + forwarded+"\n===========");
+        Enumeration headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = request.getHeader(key);
+            System.out.println("Header "+key+" "+value);
+        }
+        System.out.println("========== Request Headers END =========\n");
     }
 
     private void authenticate(String username, String password) throws Exception {
